@@ -1,0 +1,8 @@
+^renv$
+^renv\.lock$
+^LICENSE\.md$
+^README\.Rmd$
+^CODE_OF_CONDUCT\.md$
+^data-raw$
+^.*\.Rproj$
+^\.Rproj\.user$

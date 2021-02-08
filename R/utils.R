@@ -2,6 +2,7 @@
 #' @import tesseract
 #' @import dplyr
 #' @import ggplot2
+#' @noRd
 get_data <- function(crop_dim, fuzz, raw_img, combo, view_cell = FALSE) {
     img_p <- raw_img %>%
         image_crop(crop_dim) %>%
@@ -17,12 +18,20 @@ get_data <- function(crop_dim, fuzz, raw_img, combo, view_cell = FALSE) {
     return(val)
 }
 
+#' @import magick
+#' @import ggplot2
+#' @noRd
+view_race_image <- function(import_file) {
+    raw_img <- image_read(import_file)
+    res <- image_ggplot(raw_img)
+    return(res)
+}
 
-# function to ingest data
 #' @import dplyr
 #' @import magick
 #' @import tesseract
 #' @import purrr
+#' @noRd
 import_race_image <- function(import_file, n_drivers = 8, save_image = FALSE, view_image = FALSE, view_cell = FALSE) {
     raw_img <- image_read(import_file)
 
@@ -67,8 +76,35 @@ import_race_image <- function(import_file, n_drivers = 8, save_image = FALSE, vi
     df2 <- dim_df %>%
         mutate(player_name = purrr::map2_chr(crop_name, fuzz_name, ~get_data(crop_dim = .x, fuzz = .y, raw_img, combo, view_cell = view_cell))) %>%
         mutate(player_time = purrr::map2_chr(crop_time, fuzz_time, ~get_data(crop_dim = .x, fuzz = .y, raw_img, combo, view_cell = view_cell))) %>%
-        select(position, player_name, player_time)
+        select(position, player_name, player_time) %>%
+        mutate(position = as.integer(position)) %>%
+        mutate_at(c("player_name", "player_time"), ~stringr::str_replace_all(., "\\n", ""))
 
     return(df2)
 
+}
+
+#' Retain original file name of uploaded file
+#'
+#' @param x result of a shiny fileInput call
+#'
+#' @return string with original file name
+#' @export
+#'
+#' @note see https://github.com/daattali/advanced-shiny/tree/master/upload-file-names
+#' @examples 
+#' \dontrun{
+#' new_path <- fixUploadFileNames(input$my_upload)$datapath
+#' }
+fixUploadedFilesNames <- function(x) {
+    if (is.null(x)) {
+        return()
+    }
+    
+    oldNames = x$datapath
+    newNames = file.path(dirname(x$datapath),
+                         x$name)
+    file.rename(from = oldNames, to = newNames)
+    x$datapath <- newNames
+    x
 }

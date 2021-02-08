@@ -1,0 +1,27 @@
+Package: hotshots.data
+Title: Hotshots Racing Screenshot Extractor
+Version: 0.0.0.9000
+Authors@R: person('Eric ', 'Nantz', email = 'thercast@gmail.com', role = c('cre', 'aut'))
+Description: This is a simple shiny app to extract race results from a screenshot taken in Hotshots Racing.
+License: MIT + file LICENSE
+Imports: 
+    config,
+    golem,
+    shiny,
+    magick,
+    tesseract,
+    dplyr,
+    tidyr,
+    purrr,
+    fs,
+    stringr,
+    ggplot2,
+    htmltools,
+    magrittr
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.1.1
+URL: https://github.com/rpodcast/hotshots.data
+BugReports: https://github.com/rpodcast/hotshots.data/issues
+Depends: 
+    R (>= 2.10)
