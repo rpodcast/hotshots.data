@@ -82,6 +82,7 @@ import_race_image <- function(import_file, n_drivers = 8, save_image = FALSE, vi
     
     # merge in points data
     df2 <- left_join(df2, hotshot_points, by = "position")
+    df2 <- mutate(df2, points = ifelse(player_time == "DNF", 0, points))
 
     return(df2)
 }
