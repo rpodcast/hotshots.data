@@ -77,11 +77,13 @@ import_race_image <- function(import_file, n_drivers = 8, save_image = FALSE, vi
         mutate(player_name = purrr::map2_chr(crop_name, fuzz_name, ~get_data(crop_dim = .x, fuzz = .y, raw_img, combo, view_cell = view_cell))) %>%
         mutate(player_time = purrr::map2_chr(crop_time, fuzz_time, ~get_data(crop_dim = .x, fuzz = .y, raw_img, combo, view_cell = view_cell))) %>%
         select(position, player_name, player_time) %>%
-        mutate(position = as.integer(position)) %>%
+        mutate(position = as.numeric(position)) %>%
         mutate_at(c("player_name", "player_time"), ~stringr::str_replace_all(., "\\n", ""))
+    
+    # merge in points data
+    df2 <- left_join(df2, hotshot_points, by = "position")
 
     return(df2)
-
 }
 
 #' Retain original file name of uploaded file
