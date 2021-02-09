@@ -24,7 +24,7 @@ usethis::use_package( "fs" )
 usethis::use_package( "stringr" )
 usethis::use_package( "ggplot2" )
 usethis::use_package( "excelR" )
-
+usethis::use_package( "pins" )
 
 ## Add modules ----
 ## Create a module infrastructure in R/
