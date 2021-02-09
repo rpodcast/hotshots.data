@@ -23,6 +23,8 @@ usethis::use_package( "purrr" )
 usethis::use_package( "fs" )
 usethis::use_package( "stringr" )
 usethis::use_package( "ggplot2" )
+usethis::use_package( "excelR" )
+
 
 ## Add modules ----
 ## Create a module infrastructure in R/
@@ -43,6 +45,7 @@ golem::add_css_file( "custom" )
 ## Add internal datasets ----
 ## If you have data in your package
 usethis::use_data_raw( name = "hotshot_data", open = FALSE ) 
+usethis::use_data_raw( name = "hotshot_points", open = TRUE)
 
 ## Tests ----
 ## Add one line by test you want to create
