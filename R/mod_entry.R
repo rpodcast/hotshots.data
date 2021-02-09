@@ -35,6 +35,14 @@ mod_entry_ui <- function(id){
           "Edit table",
           value = FALSE
         )
+      ),
+      col_3(
+        actionButton(
+          ns("upload_data"),
+          "Upload",
+          icon = icon("upload"),
+          class = "btn-success"
+        )
       )
     ),
     fluidRow(
