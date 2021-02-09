@@ -112,6 +112,11 @@ mod_entry_server <- function(input, output, session, meta_df){
         )
       )
     
+    res <- tidyr::unnest(res, cols = "standings_table") %>%
+      select(., -import_file)
+    
+    table_edit_rv(res)
+    
     return(res)
   })
   
@@ -119,28 +124,22 @@ mod_entry_server <- function(input, output, session, meta_df){
   meta_final <- reactive({
     req(meta_df())
     req(meta_extract())
+    req(table_edit_rv())
     
-    res <- dplyr::bind_cols(meta_df(), meta_extract()) %>%
-      tidyr::unnest(cols = "standings_table")
+    res <- dplyr::bind_cols(meta_df(), table_edit_rv())
     
     return(res)
   })
   
   # edit viewer
   output$table_edit_ui <- excelR::renderExcel({
-    req(meta_extract())
-    
-    # process input beforehand
-    df <- meta_extract() %>%
-      tidyr::unnest(cols = "standings_table") %>%
-      select(., -import_file)
-    
+    req(table_edit_rv())
     excelTable(
-      data = df,
+      data = table_edit_rv(),
       columns = tibble::tibble(
-        title = c("Position", "Name", "Time"),
-        width = c(100, 200, 200),
-        type = c('text', 'text', 'text')
+        title = c("Position", "Name", "Time", "Points"),
+        width = c(100, 200, 200, 100),
+        type = c('text', 'text', 'text', 'text')
       ),
       columnSorting = FALSE,
       rowDrag = FALSE,
@@ -163,12 +162,18 @@ mod_entry_server <- function(input, output, session, meta_df){
     }
   })
   
+  # display contents of table
   output$table <- renderTable({
     req(meta_final())
     dplyr::select(meta_final(), position, player_name, player_time, points,
                   track, direction, driver, car)
   })
   
+  # upload data to pins repo
+  observeEvent(input$upload_data, {
+    req(meta_final())
+    message("entered here")
+  })
   
   
 }
