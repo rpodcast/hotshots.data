@@ -28,6 +28,13 @@ mod_entry_ui <- function(id){
           value = 8,
           step = 1
         )
+      ),
+      col_3(
+        checkboxInput(
+          ns("edit_table"),
+          "Edit table",
+          value = FALSE
+        )
       )
     ),
     fluidRow(
@@ -35,6 +42,11 @@ mod_entry_ui <- function(id){
         plotOutput(ns("preview"))
       ),
       col_6(
+        conditionalPanel(
+          condition = "input.edit_table",
+          ns = ns,
+          excelR::excelOutput(ns("table_edit_ui"))
+        ),
         tableOutput(ns("table"))
       )
     )
@@ -43,9 +55,13 @@ mod_entry_ui <- function(id){
     
 #' entry Server Function
 #' @import dplyr
+#' @import excelR
 #' @noRd 
 mod_entry_server <- function(input, output, session, meta_df){
   ns <- session$ns
+  
+  # reactive values
+  table_edit_rv <- reactiveVal(NULL)
   
   # obtain path to uploaded file after fix
   image_path <- reactive({
@@ -75,9 +91,7 @@ mod_entry_server <- function(input, output, session, meta_df){
     req(input$n_racers)
     
     # assemble input tibble
-    df <- tibble::tibble(
-      import_file = image_path()
-    )
+    df <- tibble::tibble(import_file = image_path())
     
     res <- df %>%
       mutate(
@@ -104,9 +118,46 @@ mod_entry_server <- function(input, output, session, meta_df){
     return(res)
   })
   
+  # edit viewer
+  output$table_edit_ui <- excelR::renderExcel({
+    req(meta_extract())
+    
+    # process input beforehand
+    df <- meta_extract() %>%
+      tidyr::unnest(cols = "standings_table") %>%
+      select(., -import_file)
+    
+    excelTable(
+      data = df,
+      columns = tibble::tibble(
+        title = c("Position", "Name", "Time"),
+        width = c(100, 200, 200),
+        type = c('text', 'text', 'text')
+      ),
+      columnSorting = FALSE,
+      rowDrag = FALSE,
+      allowInsertRow = FALSE,
+      allowInsertColumn = FALSE,
+      allowDeleteRow = FALSE,
+      allowDeleteColumn = FALSE,
+      allowRenameColumn = FALSE
+    )
+  })
+  
+  # TODO: Finish
+  observeEvent(input$table_edit_ui, {
+    table_data <- excelR::excel_to_R(input$table_edit_ui)
+    if (!is.null(table_data)) {
+      # workaround to get column names back to normal
+      names(table_data) <- c("position", "player_name", "player_time", "points")
+      
+      table_edit_rv(table_data)
+    }
+  })
+  
   output$table <- renderTable({
     req(meta_final())
-    dplyr::select(meta_final(), position, player_name, player_time,
+    dplyr::select(meta_final(), position, player_name, player_time, points,
                   track, direction, driver, car)
   })
   
