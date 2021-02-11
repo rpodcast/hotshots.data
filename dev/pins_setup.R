@@ -5,6 +5,10 @@ board_register_local(name = "blah", cache = "prototyping/board_stuff")
 
 board_register_github(repo = "rpodcast/hotshots.board")
 
+board_register_dospace()
+pin_get("hotshots_race_results_latest", board = "dospace")
+
+
 data(mtcars)
 pin(mtcars, board = "blah")
 
