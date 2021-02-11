@@ -27,6 +27,29 @@ view_race_image <- function(import_file) {
     return(res)
 }
 
+#' @import magick
+copy_race_image <- function(import_file, new_filename = NULL, resolution = "1920x1080") {
+    raw_img <- image_read(import_file)
+    
+    # grab file extension
+    file_ext <- fs::path_ext(import_file)
+    
+    # use current file name if a new one is not specified
+    if (is.null(new_filename)) {
+        # grab file name without extension
+        new_filename <- fs::path_file(import_file)
+    }
+    
+    # scale image
+    new_img <- image_scale(raw_img, resolution)
+    
+    new_path <- fs::path(fs::path_dir(import_file), paste0(new_filename, ".", file_ext))
+    image_write(new_img, path = new_path)
+    
+    message(glue::glue("new image file: {new_path}"))
+    return(new_path)
+}
+
 #' @import dplyr
 #' @import magick
 #' @import tesseract
@@ -110,4 +133,53 @@ fixUploadedFilesNames <- function(x) {
     file.rename(from = oldNames, to = newNames)
     x$datapath <- newNames
     x
+}
+
+#' @import shiny
+#' @import pins
+#' @noRd
+hotshots_pin_reactive <- function(name, board, interval = 5000, session = NULL, extract = NULL) {
+    # custom version of pins::pin_reactive to deal with a pin not being there initially
+    
+    board_object <- pins::board_get(board)
+    
+    shiny::reactivePoll(
+        intervalMillis = interval,
+        session = session,
+        checkFunc = function() {
+            # check that pin is actually present before determining the changed time
+            pin_check <- pins::pin_find(name, board)
+            
+            if (nrow(pin_check) < 1) {
+                return(NULL)
+            } else {
+                changed_time <- pins:::pin_changed_time(name, board, extract = extract)
+                pins:::pin_log("pin_reactive() change time: ", changed_time)
+                
+                changed_time
+            }
+        },
+        valueFunc = function() {
+            # check that pin is actually present before determining the changed time
+            pin_check <- pin_find(name, board)
+            
+            if (nrow(pin_check) < 1) {
+                return(NULL)
+            } else {
+                res <- pins:::pin_get(name, board = board, extract = extract)
+                return(res)
+            }
+        })
+}
+
+#' @import pins
+#' @noRd
+pin_exists <- function(name, board) {
+    board_object <- pins::board_get(board)
+    pin_check <- pins::pin_find(name, board)
+    if (nrow(pin_check) < 1) {
+        return(FALSE)
+    } else {
+        return(TRUE)
+    }
 }
