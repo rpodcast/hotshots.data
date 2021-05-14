@@ -12,10 +12,17 @@ mod_metadata_ui <- function(id){
   tagList(
     fluidRow(
       col_2(
+        selectInput(
+          ns("season"),
+          "Select season",
+          choices = c("2021_gp1", "2021_gp2"),
+          selected = "2021_gp1"
+        )
+      ),
+      col_2(
         dateInput(
           ns("race_date"),
-          "Race Date",
-          
+          "Race Date"
         )
       ),
       col_2(
@@ -33,15 +40,17 @@ mod_metadata_ui <- function(id){
           choices = c("normal", "mirrored"),
           selected = "normal"
         )
-      ),
-      col_2(
+      )
+    ),
+    fluidRow(
+      col_3(
         selectInput(
           ns("driver"),
           "Select Driver",
           choices = names(hotshot_data$drivers)
         )
       ),
-      col_2(uiOutput(ns("car_placeholder")))
+      col_3(uiOutput(ns("car_placeholder")))
     )
   )
 }
@@ -81,6 +90,7 @@ mod_metadata_server <- function(input, output, session){
     req(input$car)
     # driver, car, track, direction, grand_prix, date
     tibble::tibble(
+      season = input$season,
       driver = input$driver,
       car = input$car,
       track = input$track,
