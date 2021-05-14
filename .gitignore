@@ -5,3 +5,4 @@
 prototyping/*
 !prototyping/README.md
 .Renviron
+inst/doc

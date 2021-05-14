@@ -54,7 +54,7 @@ usethis::use_test( "app" )
 # Documentation
 
 ## Vignette ----
-usethis::use_vignette("hotshots.data")
+usethis::use_vignette("standings_scraping")
 devtools::build_vignettes()
 
 ## Code coverage ----

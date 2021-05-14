@@ -326,7 +326,7 @@ hotshot_data <- list(
         pro_circuit = c("boneyard", "fossil_cave", "ocean_world", "royal_roadway"),
         racing_elite = c("dino_dash", "heated_highway", "alpine_town", "casino_run"),
         hotshot = c("ski_paradise", "temple_ruins", "downtown", "sea_view"),
-        boss_level = c("8_ball_highway", "surf_city", "cargo_chaos", "frozen_freeway")
+        boss_level = c("surf_city", "8_ball_highway",  "cargo_chaos", "frozen_freeway")
     )
 )
 
