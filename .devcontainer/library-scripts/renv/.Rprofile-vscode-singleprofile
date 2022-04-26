@@ -1,7 +1,4 @@
-# vscode flag
-.in_vscode <- Sys.getenv("CODESPACES") == "true" || Sys.getenv("TERM_PROGRAM") == "vscode"
-
-if (.in_vscode) {
+if (Sys.getenv("CODESPACES") == "true" || Sys.getenv("TERM_PROGRAM") == "vscode") {
   source(file.path(Sys.getenv(if (.Platform$OS.type == "windows") "USERPROFILE" else "HOME"), ".vscode-R", "init.R"))
   options(vsc.rstudioapi = TRUE)
   # use the new httpgd plotting device
